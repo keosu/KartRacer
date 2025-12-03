@@ -1,6 +1,6 @@
-import * as express from "express"
-import * as http from "http"
-import * as sio from "socket.io";
+import express from "express"
+import http from "http"
+import sio from "socket.io";
 
 interface ISocket extends sio.Socket {
     customData: {
@@ -20,16 +20,17 @@ var pingMS = 100;
 
 // Basic express webserver
 var app = express()
-app.use("/public", express.static("public"))
-app.get('/', function (req, res) {
-    res.sendFile(process.cwd() + "/public/index.html")
-})
+// app.use(express.static("dist/public"))
+// app.get('/', function (req, res) {
+//     res.sendFile(process.cwd() + "/dist/public/index.html")
+// })
 var server = http.createServer(app)
 server.listen(port)
 
 // socket io configuration for multiplayer
 var io = sio(server)
 var rooms: { [name: string]: { users: Array<any>, raceId: number } } = {}
+
 io.on('connection', function (socket: ISocket) {
     socket.customData = {
         roomName: "",
@@ -42,7 +43,7 @@ io.on('connection', function (socket: ISocket) {
         driverMaterialIndex: 0
     };
     console.log('a user connected');
-    socket.on("joinRoom", (e) => {
+    socket.on("joinRoom", (e: any) => {
         if (!rooms[e.roomName]) {
             rooms[e.roomName] = {
                 users: [],
@@ -57,7 +58,7 @@ io.on('connection', function (socket: ISocket) {
         room.users.push(socket);
         socket.emit("joinRoomComplete", { id: socket.id, pingMS: pingMS, raceId: room.raceId });
     })
-    socket.on("updateKartPose", (pose) => {
+    socket.on("updateKartPose", (pose: any) => {
         socket.customData.position.x = pose.p.x;
         socket.customData.position.y = pose.p.y;
         socket.customData.position.z = pose.p.z;
@@ -86,7 +87,7 @@ io.on('connection', function (socket: ISocket) {
             s.emit("userDisconnected", socket.id)
         })
     })
-    socket.on("raceComplete", (e) => {
+    socket.on("raceComplete", (e: any) => {
         const room = rooms[socket.customData.roomName];
         if (!room) {
             return;

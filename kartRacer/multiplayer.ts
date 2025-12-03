@@ -1,9 +1,9 @@
 import { Vector3, Nullable, Quaternion, Scene, Scalar, Tools, Observable } from '@babylonjs/core';
 import { Kart } from './kart';
 import { Assets } from './assets';
+import io from 'socket.io-client';
 
 // Socket io
-declare var io: any;
 
 export interface IRaceInfo {
     trackVarianceSeed: number;
@@ -30,7 +30,7 @@ export class Multiplayer {
     private _assets: Assets;
     private _mainKart: Kart;
     private _raceId = 0;
-    private _socket: SocketIO.Socket;
+    private _socket: SocketIOClient.Socket;
     private _waitingForNextRace = false;
 
     constructor(scene: Scene, assets: Assets, mainKart: Kart) {
@@ -41,7 +41,7 @@ export class Multiplayer {
 
     public connectAsync(roomName: string, playerName: string, trackedObject: Nullable<ITrackedObject>, bodyMaterialIndex: number, driverMaterialIndex: number): Promise<IRaceInfo> {
         return new Promise(resolve => {
-            var socket: SocketIO.Socket = io();
+            var socket = io();
             this._socket = socket;
             socket.emit("joinRoom", {
                 roomName: "test",
@@ -49,7 +49,7 @@ export class Multiplayer {
                 bodyMaterialIndex: bodyMaterialIndex,
                 driverMaterialIndex: driverMaterialIndex
             });
-            socket.on("joinRoomComplete", (e) => {
+            socket.on("joinRoomComplete", (e: any) => {
                 this._raceId = e.raceId;
                 this.localId = e.id;
                 this.trackedObject = trackedObject;
@@ -67,7 +67,7 @@ export class Multiplayer {
                     }
                 }, e.pingMS)
 
-                socket.on("serverUpdate", (e) => {
+                socket.on("serverUpdate", (e: any) => {
                     e.forEach((p: any) => {
                         if (p.id != this.localId) {
                             let trackedServerObject = this.trackedServerObjects[p.id];
@@ -94,14 +94,14 @@ export class Multiplayer {
                     })
                 })
 
-                socket.on("userDisconnected", (id) => {
+                socket.on("userDisconnected", (id: string) => {
                     if (this.trackedServerObjects[id]) {
                         (this.trackedServerObjects[id].object as any).dispose();
                         delete this.trackedServerObjects[id]
                     }
                 })
 
-                socket.on("raceComplete", (info) => {
+                socket.on("raceComplete", (info: any) => {
                     if (!this._waitingForNextRace) {
                         this._waitingForNextRace = true;
                         this._mainKart.PlayerMenu.SetWinText("GG! The winner is\n" + info.winnerName);
