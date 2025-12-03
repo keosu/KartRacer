@@ -1,6 +1,7 @@
 import express from "express"
 import http from "http"
 import sio from "socket.io";
+import process from "process";
 
 interface ISocket extends sio.Socket {
     customData: {
@@ -20,10 +21,13 @@ var pingMS = 100;
 
 // Basic express webserver
 var app = express()
-// app.use(express.static("dist/public"))
-// app.get('/', function (req, res) {
-//     res.sendFile(process.cwd() + "/dist/public/index.html")
-// })
+// Only serve static files in production environment
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static("dist/public"))
+    app.get('/', function (req, res) {
+        res.sendFile(process.cwd() + "/dist/public/index.html")
+    })
+}
 var server = http.createServer(app)
 server.listen(port)
 

@@ -1,4 +1,4 @@
-import { Mesh, Texture, Observable, Scene, FreeCamera, Vector3, PBRMaterial } from "@babylonjs/core";
+import { Mesh, Texture, Observable, Scene, FreeCamera, Vector3, PBRMaterial, Color3 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, StackPanel, Button, InputText } from "@babylonjs/gui";
 import { Assets } from "./assets";
 
@@ -28,24 +28,48 @@ export class Billboard {
 
         const stackPanel = new StackPanel();
         stackPanel.top = "200px";
+        stackPanel.width = "800px";
+        stackPanel.height = "300px";
+        stackPanel.horizontalAlignment = StackPanel.HORIZONTAL_ALIGNMENT_CENTER;
         mainMenuGUI.addControl(stackPanel);
+
+        // Title
+        const title = new InputText();
+        title.width = 1;
+        title.height = "60px";
+        title.placeholderText = "Kart Racer";
+        title.fontSize = 40;
+        title.color = "white";
+        title.background = "transparent";
+        title.focusedBackground = "transparent";
+        title.isReadOnly = true;
+        title.textHorizontalAlignment = InputText.HORIZONTAL_ALIGNMENT_CENTER;
+        title.textVerticalAlignment = InputText.VERTICAL_ALIGNMENT_CENTER;
+        title.thickness = 0;
+        stackPanel.addControl(title);
 
         const racerName = new InputText("racerName");
         racerName.width = 1;
-        racerName.height = "100px";
+        racerName.height = "80px";
         racerName.placeholderText = "Enter racer name...";
-        racerName.fontSize = 50;
+        racerName.fontSize = 36;
         racerName.color = "black";
-        racerName.background = "white";
-        racerName.focusedBackground = "white";
+        racerName.background = "rgba(255, 255, 255, 0.8)";
+        racerName.focusedBackground = "rgba(255, 255, 255, 1)";
+        racerName.hoverCursor = "text";
+        racerName.thickness = 2;
+        racerName.cornerRadius = 10;
         stackPanel.addControl(racerName);
 
         const startButton = Button.CreateSimpleButton("start", "Start Game");
         startButton.width = 1;
-        startButton.height = "100px";
+        startButton.height = "80px";
         startButton.color = "white";
-        startButton.fontSize = 50;
-        startButton.background = "green"
+        startButton.fontSize = 36;
+        startButton.background = "#4CAF50";
+        startButton.hoverBackground = "#45a049";
+        startButton.thickness = 0;
+        startButton.cornerRadius = 10;
         stackPanel.addControl(startButton);
 
         const billBoardBase = Mesh.CreateBox("base", 1, scene)
